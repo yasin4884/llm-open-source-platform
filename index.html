@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤗 HuggingFace Model Platform</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab, #667eea, #764ba2);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Header */
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .logo i {
+            font-size: 2rem;
+            background: var(--warning-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: var(--success-gradient);
+            color: #1a202c;
+        }
+
+        .status-badge.loading {
+            background: var(--warning-gradient);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 1fr;
+            gap: 1.5rem;
+            padding: 90px 1.5rem 1.5rem;
+            min-height: 100vh;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar - Models Drawer */
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            height: fit-content;
+            max-height: calc(100vh - 110px);
+            overflow-y: auto;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-title {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-title i {
+            background: var(--success-gradient);
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        /* Model Config Section */
+        .config-section {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .config-section h4 {
+            color: white;
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .config-section h4 i {
+            color: #4facfe;
+        }
+
+        .form-group {
+            margin-bottom: 0.8rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .glass-input, .glass-select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
+            color: white;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-input:focus, .glass-select:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .glass-select option {
+            background: #4a5568;
+            color: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: var(--primary-gradient); color: white; }
+        .btn-success { background: var(--success-gradient); color: #1a202c; }
+        .btn-accent { background: var(--accent-gradient); color: #1a202c; }
+        .btn-warning { background: var(--warning-gradient); color: #1a202c; }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Downloaded Models List */
+        .models-list {
+            margin-top: 1rem;
+        }
+
+        .models-list-title {
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .model-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .model-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .model-item.active {
+            border-color: #4facfe;
+            background: rgba(79, 172, 254, 0.2);
+        }
+
+        .model-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .model-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .model-icon.causal { background: var(--primary-gradient); }
+        .model-icon.seq2seq { background: var(--accent-gradient); }
+        .model-icon.base { background: var(--success-gradient); }
+
+        .model-details {
+            min-width: 0;
+        }
+
+        .model-name {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .model-type-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+        }
+
+        .delete-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 8px;
+            background: var(--secondary-gradient);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 110px);
+        }
+
+        .card-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .card-header i {
+            font-size: 1.3rem;
+            padding: 10px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .card-header.chat i { background: var(--primary-gradient); }
+        .card-header.code i { background: var(--accent-gradient); }
+
+        .card-title {
+            color: white;
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .card-body {
+            padding: 1.2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Chat Area */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 0.9rem 1.1rem;
+            border-radius: 16px;
+            margin-bottom: 0.8rem;
+            animation: messageIn 0.3s ease;
+        }
+
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            background: var(--primary-gradient);
+            color: white;
+            margin-left: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.assistant {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            margin-right: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 0.4rem;
+        }
+
+        .empty-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+        }
+
+        .empty-chat i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .chat-input-area .glass-input {
+            flex: 1;
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Code Output */
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .code-header span {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .copy-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .code-output {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .code-output pre {
+            color: #e2e8f0;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            direction: ltr;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .code-output .keyword { color: #f093fb; }
+        .code-output .string { color: #43e97b; }
+        .code-output .comment { color: #718096; }
+        .code-output .function { color: #4facfe; }
+
+        .empty-code {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+        }
+
+        .empty-code i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success { background: var(--success-gradient); color: #1a202c; }
+        .toast.error { background: var(--secondary-gradient); }
+        .toast.info { background: var(--accent-gradient); color: #1a202c; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 280px 1fr;
+            }
+            .glass-card:last-child {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 80px 1rem 1rem;
+            }
+            .sidebar {
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+            .glass-card {
+                height: auto;
+                min-height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-robot"></i>
+            <span>HF Model Platform</span>
+        </div>
+        <div class="status-area">
+            <div class="status-badge" id="statusBadge">
+                <i class="fas fa-circle"></i>
+                <span>آماده</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Sidebar - Model Configuration -->
+        <aside class="sidebar">
+            <div class="sidebar-title">
+                <i class="fas fa-cogs"></i>
+                تنظیمات مدل
+            </div>
+
+            <!-- Model Config Form -->
+            <div class="config-section">
+                <h4><i class="fas fa-download"></i> دانلود مدل جدید</h4>
+                <div class="form-group">
+                    <label>نام مدل (HuggingFace)</label>
+                    <input type="text" class="glass-input" id="modelNameInput" 
+                           placeholder="مثال: meta-llama/Llama-2-7b-hf">
+                </div>
+                <div class="form-group">
+                    <label>نوع مدل</label>
+                    <select class="glass-select" id="modelTypeSelect">
+                        <option value="causal">Causal LM (GPT-like)</option>
+                        <option value="seq2seq">Seq2Seq (T5/BART)</option>
+                        <option value="base">Base Model</option>
+                    </select>
+                </div>
+                <button class="btn btn-success" id="downloadBtn" onclick="downloadModel()">
+                    <i class="fas fa-cloud-download-alt"></i>
+                    دانلود و راه‌اندازی
+                </button>
+            </div>
+
+            <!-- Downloaded Models -->
+            <div class="models-list">
+                <div class="models-list-title">
+                    <i class="fas fa-layer-group"></i> مدل‌های دانلود شده
+                </div>
+                <div id="modelsList">
+                    <!-- Models will be added here dynamically -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Chat Section -->
+        <section class="glass-card">
+            <div class="card-header chat">
+                <i class="fas fa-comments"></i>
+                <div>
+                    <div class="card-title">چت با مدل</div>
+                    <div class="card-subtitle" id="activeModelName">مدلی انتخاب نشده</div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-chat">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>ابتدا یک مدل دانلود کنید<br>سپس شروع به چت کنید</p>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="glass-input" id="chatInput" 
+                           placeholder="پیام خود را بنویسید..." disabled>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Generation Section -->
+        <section class="glass-card">
+            <div class="card-header code">
+                <i class="fas fa-code"></i>
+                <div>
+                    <div class="card-title">کد تولید شده</div>
+                    <div class="card-subtitle">توسط Qwen Code Generator</div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="code-header">
+                    <span id="codeModelName">منتظر دانلود مدل...</span>
+                    <button class="copy-btn" onclick="copyCode()" id="copyBtn" style="display: none;">
+                        <i class="fas fa-copy"></i>
+                        کپی کد
+                    </button>
+                </div>
+                <div id="codeContainer">
+                    <div class="empty-code">
+                        <i class="fas fa-file-code"></i>
+                        <p>با دانلود مدل، کد اولیه<br>به صورت خودکار تولید می‌شود</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">عملیات موفق</span>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let activeModel = null;
+        let downloadedModels = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadModels();
+            
+            // Enter key for chat
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+
+        // Load existing models
+        async function loadModels() {
+            try {
+                const response = await fetch(`${API_BASE}/models`);
+                const data = await response.json();
+                downloadedModels = data.details || {};
+                renderModelsList();
+            } catch (error) {
+                console.log('Could not load models:', error);
+            }
+        }
+
+        // Download model
+        async function downloadModel() {
+            const modelName = document.getElementById('modelNameInput').value.trim();
+            const modelType = document.getElementById('modelTypeSelect').value;
+
+            if (!modelName) {
+                showToast('لطفاً نام مدل را وارد کنید', 'error');
+                return;
+            }
+
+            setLoading(true, 'در حال دانلود...');
+
+            try {
+                // 1. Download and configure model
+                const downloadResponse = await fetch(`${API_BASE}/models/download`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model_name: modelName,
+                        model_type: modelType
+                    })
+                });
+
+                if (!downloadResponse.ok) throw new Error('خطا در دانلود مدل');
+
+                // 2. Generate code with Qwen (parallel)
+                const codeResponse = await fetch(`${API_BASE}/generate-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target_model_name: modelName,
+                        model_type: getModelTypeClass(modelType)
+                    })
+                });
+
+                const codeData = await codeResponse.json();
+
+                // Update UI
+                downloadedModels[modelName] = { type: modelType };
+                renderModelsList();
+                selectModel(modelName);
+                displayGeneratedCode(modelName, codeData.generated_code);
+
+                showToast('مدل با موفقیت دانلود شد!', 'success');
+                document.getElementById('modelNameInput').value = '';
+
+            } catch (error) {
+                showToast(error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Get model type class name
+        function getModelTypeClass(type) {
+            const mapping = {
+                'causal': 'AutoModelForCausalLM',
+                'seq2seq': 'AutoModelForSeq2SeqLM',
+                'base': 'AutoModel'
+            };
+            return mapping[type] || 'AutoModelForCausalLM';
+        }
+
+        // Render models list
+        function renderModelsList() {
+            const container = document.getElementById('modelsList');
+            const models = Object.keys(downloadedModels);
+
+            if (models.length === 0) {
+                container.innerHTML = `
+                    <div style="color: rgba(255,255,255,0.5); text-align: center; padding: 1rem;">
+                        هنوز مدلی دانلود نشده
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = models.map(name => {
+                const model = downloadedModels[name];
+                const shortName = name.split('/').pop();
+                const isActive = activeModel === name;
+                
+                return `
+                    <div class="model-item ${isActive ? 'active' : ''}" onclick="selectModel('${name}')">
+                        <div class="model-info">
+                            <div class="model-icon ${model.type}">${shortName.substring(0, 2).toUpperCase()}</div>
+                            <div class="model-details">
+                                <div class="model-name" title="${name}">${shortName}</div>
+                                <div class="model-type-label">${model.type}</div>
+                            </div>
+                        </div>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteModel('${name}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Select model
+        function selectModel(modelName) {
+            activeModel = modelName;
+            const shortName = modelName.split('/').pop();
+            
+            document.getElementById('activeModelName').textContent = shortName;
+            document.getElementById('chatInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            
+            // Clear chat
+            document.getElementById('chatMessages').innerHTML = '';
+            
+            renderModelsList();
+            showToast(`مدل ${shortName} انتخاب شد`, 'info');
+        }
+
+        // Delete model
+        async function deleteModel(modelName) {
+            if (!confirm(`آیا از حذف ${modelName} مطمئن هستید؟`)) return;
+
+            try {
+                await fetch(`${API_BASE}/models/${encodeURIComponent(modelName)}`, {
+                    method: 'DELETE'
+                });
+                
+                delete downloadedModels[modelName];
+                if (activeModel === modelName) {
+                    activeModel = null;
+                    document.getElementById('activeModelName').textContent = 'مدلی انتخاب نشده';
+                    document.getElementById('chatInput').disabled = true;
+                    document.getElementById('sendBtn').disabled = true;
+                }
+                
+                renderModelsList();
+                showToast('مدل حذف شد', 'success');
+            } catch (error) {
+                showToast('خطا در حذف مدل', 'error');
+            }
+        }
+
+        // Send chat message
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message || !activeModel) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            const typingId = addTypingIndicator();
+
+            try {
+                const response = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model_name: activeModel,
+                        prompt: message,
+                        max_new_tokens: 256
+                    })
+                });
+
+                const data = await response.json();
+                removeTypingIndicator(typingId);
+                addMessage(data.response, 'assistant');
+
+            } catch (error) {
+                removeTypingIndicator(typingId);
+                addMessage('خطا در ارتباط با مدل', 'assistant');
+            }
+        }
+
+        // Add message to chat
+        function addMessage(text, type) {
+            const container = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `
+                <div>${text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Typing indicator
+        function addTypingIndicator() {
+            const container = document.getElementById('chatMessages');
+            const id = 'typing-' + Date.now();
+            
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'message assistant';
+            div.innerHTML = '<div class="spinner"></div>';
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        // Display generated code
+        function displayGeneratedCode(modelName, code) {
+            const shortName = modelName.split('/').pop();
+            document.getElementById('codeModelName').textContent = `کد برای: ${shortName}`;
+            document.getElementById('copyBtn').style.display = 'flex';
+            
+            const container = document.getElementById('codeContainer');
+            container.innerHTML = `
+                <div class="code-output">
+                    <pre>${highlightCode(code || '# کد تولید نشد')}</pre>
+                </div>
+            `;
+        }
+
+        // Simple syntax highlighting
+        function highlightCode(code) {
+            return code
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/(#.*$)/gm, '<span class="comment">$1</span>')
+                .replace(/\b(import|from|class|def|return|if|else|try|except|with|as|for|in|True|False|None)\b/g, '<span class="keyword">$1</span>')
+                .replace(/("[^"]*"|'[^']*')/g, '<span class="string">$1</span>')
+                .replace(/\b(\w+)\(/g, '<span class="function">$1</span>(');
+        }
+
+        // Copy code
+        function copyCode() {
+            const codeEl = document.querySelector('.code-output pre');
+            if (codeEl) {
+                navigator.clipboard.writeText(codeEl.textContent);
+                showToast('کد کپی شد!', 'success');
+            }
+        }
+
+        // Loading state
+        function setLoading(loading, text = 'در حال پردازش...') {
+            const badge = document.getElementById('statusBadge');
+            const btn = document.getElementById('downloadBtn');
+            
+            if (loading) {
+                badge.className = 'status-badge loading';
+                badge.innerHTML = `<div class="spinner"></div><span>${text}</span>`;
+                btn.disabled = true;
+                btn.innerHTML = '<div class="spinner"></div> صبر کنید...';
+            } else {
+                badge.className = 'status-badge';
+                badge.innerHTML = '<i class="fas fa-circle"></i><span>آماده</span>';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> دانلود و راه‌اندازی';
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toast.className = `toast ${type}`;
+            toastMessage.textContent = message;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle'
+            };
+            toast.querySelector('i').className = `fas ${icons[type]}`;
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
